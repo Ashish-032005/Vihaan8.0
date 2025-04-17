@@ -1,0 +1,19 @@
+
+{
+    "manifest_version": 3,
+    "name": "SafeSurf",
+    "version": "1.0",
+    "description": "Blur offensive images and remove offensive text for safe browsing",
+    "permissions": ["activeTab", "scripting"],
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"],
+        "css": ["styles.css"]
+      }
+    ],
+    "action": {
+      "default_popup": "popup.html"
+    }
+  }
+  

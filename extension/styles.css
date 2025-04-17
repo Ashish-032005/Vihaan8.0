@@ -1,0 +1,5 @@
+.blurred-safe {
+    filter: blur(10px) !important;
+    transition: filter 0.3s ease;
+  }
+  
