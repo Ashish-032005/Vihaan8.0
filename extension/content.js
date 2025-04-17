@@ -1,7 +1,7 @@
 // content.js
 
 const offensiveWords = [
-    "kutta", "kamina", "bkl", "bhenchod", "madarchod", "mc", "bc",
+    "nudes", "hot", "underwear", "young", "lady", "nude", "kutta", "kamina", "bkl", "bhenchod", "madarchod", "mc", "bc",
     "chutiya", "gandu", "randi", "harami", "saala", "gaand", 
     "fuck", "fucker", "shit", "bastard", "bloody", "suar", 
     "kutti", "jhant", "lund", "gaand", "chod", "chodu", "lavda"
