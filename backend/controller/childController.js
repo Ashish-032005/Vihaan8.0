@@ -1,24 +1,23 @@
 import Child from "../models/child.js";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
 import Parent from '../models/parent.js'; 
+import { generateToken } from "../utillity/jwt.js";
 // import Child from '../models/Child.js';
 
 // Create a new child for the parent
- const createChild = async (req, res) => {
-  const { name, email, age } = req.body;
-
+ export const createChild = async (req, res) => {
+  const {  email } = req.body;
+  console.log(req.body)
   try {
     // Find the parent by ID (assuming parent ID is available in the `req.parent` from middleware)
-    const parent = await Parent.findById(req.parent._id);
+    const parent = await Parent.findOne({email :req.user.email});
     if (!parent) {
       return res.status(404).json({ message: "Parent not found" });
     }
 
     // Create a new child instance
     const newChild = new Child({
-      name,
       email,
-      age,
       parent: parent._id, // link the child to the parent
     });
 
@@ -28,10 +27,11 @@ import Parent from '../models/parent.js';
     // Add this new child to the parent's children list
     parent.children.push(newChild._id);
     await parent.save();
+    const token=generateToken(newChild.email)
 
     res.status(201).json({
       message: "Child created successfully",
-      child: newChild,
+      token: token,
     });
   } catch (err) {
     res.status(500).json({ message: err.message });

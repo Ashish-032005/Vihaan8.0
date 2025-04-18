@@ -14,7 +14,10 @@ const urlSchema = new mongoose.Schema({
 });
 
 const childSchema = new mongoose.Schema({
-  name: String,
+  email: {
+    type:String,
+    unique:true,
+  },
   extensionToken: String,
   blockedUrls: [String],
   monitoredUrls: [urlSchema],
