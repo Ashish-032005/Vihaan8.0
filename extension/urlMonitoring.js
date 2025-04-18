@@ -9,18 +9,28 @@ let intervalId = null;
 // Send alert if incognito is being used without permission
 async function alertIncognitoOpen(url) {
   console.log("Incognito tab detected without permission. Sending alert to backend:", url);
-  await fetch(INCOGNITO_ALERT_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      incognitoDetected: true,
-      url: url,
-      timestamp: new Date().toISOString()
-    })
+
+  chrome.storage.local.get("token", async ({ jwtToken }) => {
+    if (!jwtToken) {
+      console.warn("No JWT token found.");
+      return;
+    }
+
+    await fetch('http://localhost:5000/api/monitor/incognito-alert', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${jwtToken}`
+      },
+      body: JSON.stringify({
+        incognitoDetected: true,
+        url: url,
+        timestamp: new Date().toISOString()
+      })
+    });
   });
 }
+
 
 async function checkUrlStatus(url) {
   const data = { blocked: false, timeLimitExceeded: false };
