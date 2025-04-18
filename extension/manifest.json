@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "SafeSurf",
+  "name": "CipherGuard",
   "version": "1.0",
   "description": "Blur offensive images and remove offensive text for safe browsing",
   "permissions": [

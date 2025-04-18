@@ -1,6 +1,7 @@
 // Called from extension to send current URL
 import jwt from "jsonwebtoken";
 import Child from "../models/child.js";
+import parent from "../models/parent.js"
 
 export const monitorUrl = async (req, res) => {
   try {
@@ -39,7 +40,7 @@ export const monitorUrl = async (req, res) => {
 export const alertIncognito = async (req, res) => {
   const {  url } = req.body;
   const email =req.user.email
-
+  console.log(email)
   if (!email || !url) {
     return res.status(400).json({ message: "Email and URL are required" });
   }
