@@ -10,7 +10,10 @@ import Dashboard from "./pages/Dashboard";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import { GridOverlay } from "./components/GridOverlay";
+import Login from "./pages/signin";
+import SignUp from "./pages/signup";
 import "./App.css";
+import AddChild from "./pages/AddChild"
 
 const queryClient = new QueryClient();
 
@@ -32,6 +35,9 @@ const AppRoutes = () => (
       <Route path="/" element={<Index />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route path="/add-child" element={<AddChild />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>

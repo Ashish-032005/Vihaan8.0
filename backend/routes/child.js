@@ -1,10 +1,10 @@
 import express from "express";
-import { createChild, getChildren } from "../controllers/childController.js";
-import { verifyToken } from "../middleware/auth.js";
+import { createChild, getChildren } from "../controller/childController.js";
+import { verifyToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/create", verifyToken, createChild);
+router.post("/add-child", verifyToken, createChild);
 router.get("/all", verifyToken, getChildren);
 
 export default router;
