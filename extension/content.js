@@ -586,7 +586,7 @@ const NSFW_THRESHOLD = 0.3; // adjust this based on model behavior
       formData.append("file", blob, "image.jpg");
       console.log("after formData")
       // Send request to model
-      const response = await fetch("https://84b3-34-105-2-146.ngrok-free.app/classify/", {
+      const response = await fetch("https://9953-34-16-246-1.ngrok-free.app/classify/", {
         method: "POST",
         body: formData,
       });
