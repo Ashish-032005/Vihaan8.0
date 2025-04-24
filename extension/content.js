@@ -537,17 +537,17 @@ function cleanText(node) {
   }
 }
 cleanText(document.body);
-// function blurOffensiveImages() {
-//   document.querySelectorAll("img").forEach((img) => {
-//     const altText = img.alt.toLowerCase();
-//     if (offensiveWords.some((word) => altText.includes(word))) {
-//       img.classList.add("blurred-safe");
-//     }
-//   });
-// }
+function blurOffensiveImages() {
+  document.querySelectorAll("img").forEach((img) => {
+    const altText = img.alt.toLowerCase();
+    if (offensiveWords.some((word) => altText.includes(word))) {
+      img.classList.add("blurred-safe");
+    }
+  });
+}
 
-// // Initial run
-// blurOffensiveImages();
+// Initial run
+blurOffensiveImages();
 
 
 // // Mutation Observer for dynamic pages
@@ -560,7 +560,7 @@ cleanText(document.body);
 //   });
 // });
 
-// observer.observe(document.body, { childList: true, subtree: true });
+observer.observe(document.body, { childList: true, subtree: true });
 
 const NSFW_THRESHOLD = 0.3; // adjust this based on model behavior
 
