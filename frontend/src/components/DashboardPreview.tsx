@@ -62,8 +62,26 @@ export const DashboardPreview = ({ childEmail }) => {
         );
         if (usageRes) {
           const usageData = await usageRes.json();
-          setRecentSearches(usageData.recentSearches?.slice(0, 5) || []);
-          setWebsiteCategories(usageData.websiteCategories || []);
+            const sortedUsage = usageData.usageDetails
+  .filter(item => item.lastUpdated) // Ensure valid timestamps
+  .sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
+
+console.log(sortedUsage)
+    setRecentSearches(sortedUsage.slice(0, 5));
+       const categoryMap = {};
+    usageData.usageDetails.forEach(item => {
+      const category = item.category || "general";
+      categoryMap[category] = (categoryMap[category] || 0) + 1;
+    });
+
+    const categories = Object.entries(categoryMap).map(([category, count]) => ({
+      category,
+      count,
+    }));
+
+    setWebsiteCategories(categories);    
+
+
         }
 
         // Fetch blocked websites
@@ -174,6 +192,19 @@ export const DashboardPreview = ({ childEmail }) => {
       description: "Recent searches have been cleared",
     });
   };
+  const getColorForCategory = (category) => {
+  const colorMap = {
+    Social: "#F87171", // red
+    Education: "#60A5FA", // blue
+    Entertainment: "#FBBF24", // yellow
+    News: "#34D399", // green
+    Productivity: "#A78BFA", // purple
+    general: "#F472B6", // pink
+  };
+
+  return colorMap[category] || "#E5E7EB"; // default light gray
+};
+
 
   return (
     <div className="bg-[#171723] rounded-xl shadow-lg border border-[#2A2A3C] overflow-hidden relative">
@@ -279,7 +310,7 @@ export const DashboardPreview = ({ childEmail }) => {
                       className="flex items-center p-2 bg-[#11111D] rounded-lg border border-[#2A2A3C]/50"
                     >
                       <Search className="h-4 w-4 text-cyan-400 mr-2" />
-                      <span className                      ="text-sm text-white truncate">{search}</span>
+                      <span className                      ="text-sm text-white truncate">{search.domain}</span>
                     </div>
                   ))
                 ) : (
@@ -290,28 +321,38 @@ export const DashboardPreview = ({ childEmail }) => {
               </div>
             </div>
 
-            {/* Website Categories */}
-            <div className="dashboard-card col-span-3 md:col-span-1">
-              <h3 className="font-semibold text-white neon-text mb-3">
-                Website Categories
-              </h3>
-              <ul className="text-sm text-white space-y-2">
-                {websiteCategories.length > 0 ? (
-                  websiteCategories.map((cat, idx) => (
-                    <li
-                      key={idx}
-                      className="bg-[#11111D] px-3 py-2 rounded-lg border border-[#2A2A3C]/50"
-                    >
-                      {cat}
-                    </li>
-                  ))
-                ) : (
-                  <li className="text-cyan-400 text-sm text-center">
-                    No categories found
-                  </li>
-                )}
-              </ul>
-            </div>
+          {/* Website Categories */}
+<div className="dashboard-card col-span-3 md:col-span-1">
+  <h3 className="font-semibold text-white neon-text mb-3">
+    Website Categories
+  </h3>
+  <ul className="text-sm text-white space-y-2">
+    {websiteCategories.length > 0 ? (
+      websiteCategories.map((cat, idx) => (
+        <li
+          key={idx}
+          className="flex justify-between items-center bg-[#11111D] px-3 py-2 rounded-lg border border-[#2A2A3C]/50"
+        >
+          <span className="text-white">{cat.category}</span>
+          <span
+            className={`text-xs font-bold px-2 py-1 rounded-full`}
+            style={{
+              backgroundColor: getColorForCategory(cat.category),
+              color: "#000",
+            }}
+          >
+            {cat.count}
+          </span>
+        </li>
+      ))
+    ) : (
+      <li className="text-cyan-400 text-sm text-center">
+        No categories found
+      </li>
+    )}
+  </ul>
+</div>
+
 
             {/* Screen Time Management */}
             <div className="dashboard-card col-span-3 md:col-span-2">

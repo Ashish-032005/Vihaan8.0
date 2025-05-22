@@ -117,6 +117,7 @@ export const getWebUsageStatsFull = async (req, res) => {
       webUsage.push({
         domain: urlObj.domain,
         minutes: time,
+        category : urlObj.category,
         lastUpdated: urlObj.lastUpdated
       });
     });

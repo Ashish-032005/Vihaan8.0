@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const urlSchema = new mongoose.Schema({
   url: String,
   domain: String,
+  category:String , 
   dailyTimeSpent: {
     type: Map,
     of: Number, 
