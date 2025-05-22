@@ -66,10 +66,10 @@ export const getChildAlerts = async (req, res) => {
 
 // Block a URL for a specific child
 export const blockUrl = async (req, res) => {
-  const { url } = req.body;
+  const { url , email } = req.body;
   
   try {
-    const child = await Child.findById(req.params.id);
+    const child = await Child.findOne({email});
     if (!child) {
       return res.status(404).json({ message: "Child not found" });
     }

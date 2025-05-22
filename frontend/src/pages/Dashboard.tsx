@@ -10,7 +10,7 @@ import { DeviceList } from "@/components/DeviceList";
 import { ProtectionStatus } from "@/components/ProtectionStatus";
 import { ActivityMonitor } from "@/components/ActivityMonitor";
 import { Button } from "@/components/Button";
-import { User, LogOut, Shield, Edit, Plus } from "lucide-react";
+import { User, LogOut, Shield, Edit, Plus, CloudLightning } from "lucide-react";
 import { useEffect, useState } from "react";
 // import { Button } from "../components/Button";
 import axios from "axios";
@@ -41,8 +41,8 @@ const Dashboard = () => {
     const [parentEmail, setParentEmail] = useState("");
     const navigate=useNavigate();
     const unreadCount = notifications.filter(n => !n.read).length;
-    const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
-
+    const [selectedChildEmail, setSelectedChildEmail] = useState<string | null>(null);
+    console.log(selectedChildEmail)
    // Fetch data on mount
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -336,12 +336,14 @@ const Dashboard = () => {
                              <div className="h-8 w-8 rounded-full bg-cipher-purple/20 flex items-center justify-center relative group-hover:bg-cipher-purple/30 transition-colors">
                                <span className="text-xs text-white">{idx+1}</span>
                              </div>
-                             <div onClick={()=>(setSelectedChildId(child._id))}>
-                               <span className={"text-sm"+(selectedChildId==child._id && "text-blue-500 ")}>{child.name}</span>
+                             <div >
+                                <span className={"text-sm " + (selectedChildEmail === child.email ? "text-blue-400 font-bold" : "")}>
+                                  {child.name}
+                                </span>
                                <span className="text-xs text-green-400 block">{child.status}</span>
                              </div>
                            </div>
-                           <Button variant="outline" size="sm" className="text-xs py-1 px-2">Monitor</Button>
+                           <Button onClick={()=>(setSelectedChildEmail(child.email))} variant="outline" size="sm" className="text-xs py-1 px-2">Monitor</Button>
                          </div>
                        ))}
              
@@ -365,15 +367,15 @@ const Dashboard = () => {
             <div className="lg:col-span-3 space-y-6">
               {activeView === "overview" && (
                 <>
-                  <DashboardStats childId={selectedChildId}  />
-                  <DashboardPreview childId={selectedChildId} />
-                  <ActivityMonitor childId={selectedChildId} />
+                  <DashboardStats childEmail={selectedChildEmail}  />
+                  <DashboardPreview childEmail={selectedChildEmail} />
+                  <ActivityMonitor childEmail={selectedChildEmail} />
                 </>
               )}
-              
-              {activeView === "devices" && (
-                <DeviceList />
-              )}
+{/*               
+              // {activeView === "devices" && (
+              //   <DeviceList />
+              // )} */}
               
               {activeView === "protect" && (
                 <div className="glass-card p-6">

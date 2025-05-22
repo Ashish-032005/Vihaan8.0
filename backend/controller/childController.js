@@ -50,3 +50,122 @@ export const getChildren = async (req, res) => {
     res.status(500).json({ message: "Error fetching children", error: err.message });
   }
 };
+
+export const getWebUsageStats = async (req, res) => {
+  try {
+    console.log(req.params)
+    const { email } = req.params;
+    const child = await Child.findOne({ email });
+    if (!child) return res.status(404).json({ message: "Child not found" });
+
+    const today = new Date().toISOString().split("T")[0];
+    let totalMinutes = 0;
+
+    child.monitoredUrls.forEach((url) => {
+      const time = url.dailyTimeSpent.get(today) || 0;
+      totalMinutes += time;
+    });
+
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    const totalTime = `${hours}h ${minutes}m`;
+
+    res.json({ totalTime });
+  } catch (err) {
+    console.error("Web usage error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+export const getAlerts = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const child = await Child.findOne({ email });
+    if (!child) return res.status(404).json({ message: "Child not found" });
+
+    res.json({ alerts: child.incognitoAlerts  });
+  } catch (err) {
+    console.error("Alerts fetch error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+export const getBlockedStats = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const child = await Child.findOne({ email });
+    if (!child) return res.status(404).json({ message: "Child not found" });
+
+    res.json({ count: child.blockedUrls.length });
+  } catch (err) {
+    console.error("Blocked content fetch error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+export const getWebUsageStatsFull = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const child = await Child.findOne({ email });
+    if (!child) return res.status(404).json({ message: "Child not found" });
+
+    const today = new Date().toISOString().split("T")[0];
+    const webUsage = [];
+    let totalMinutes = 0;
+
+    child.monitoredUrls.forEach((urlObj) => {
+      const time = urlObj.dailyTimeSpent.get(today) || 0;
+      totalMinutes += time;
+
+      webUsage.push({
+        domain: urlObj.domain,
+        minutes: time,
+        lastUpdated: urlObj.lastUpdated
+      });
+    });
+
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    res.json({
+      totalTime: `${hours}h ${minutes}m`,
+      usageDetails: webUsage
+    });
+  } catch (err) {
+    console.error("Web usage error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+// Get detailed incognito alerts
+export const getAlertsFull = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const child = await Child.findOne({ email });
+    if (!child) return res.status(404).json({ message: "Child not found" });
+
+    const alerts = child.incognitoAlerts.map(alert => ({
+      message: alert.message,
+      timestamp: alert.timestamp
+    }));
+
+    res.json({ alerts });
+  } catch (err) {
+    console.error("Alerts fetch error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get detailed blocked URLs
+export const getBlockedStatsFull = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const child = await Child.findOne({ email });
+    if (!child) return res.status(404).json({ message: "Child not found" });
+
+    const blocked = child.blockedUrls.map(url => ({
+      domain: url,
+    }));
+
+    res.json({ totalBlocked: blocked.length, blockedList: blocked });
+  } catch (err) {
+    console.error("Blocked content fetch error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

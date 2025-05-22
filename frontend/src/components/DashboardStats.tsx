@@ -1,33 +1,65 @@
-
+import { useEffect, useState } from "react";
 import { Activity, AlertTriangle, Clock, Eye } from "lucide-react";
 
-export const DashboardStats = (  childId: string | null) => {
+interface DashboardStatsProps {
+  childEmail: string | null;
+}
+
+export const DashboardStats = ({ childEmail }: DashboardStatsProps) => {
+  const [webTime, setWebTime] = useState("0m");
+  const [alerts, setAlerts] = useState(0);
+  const [blocked, setBlocked] = useState(0);
+  const [sessions, setSessions] = useState(1); // Placeholder
+
+  useEffect(() => {
+    if (!childEmail) return;
+
+    // Fetch web usage (total time today)
+    fetch(`${import.meta.env.VITE_BACKENDURL}/api/child/web-usage/${childEmail}`)
+      .then((res) => res.json())
+      .then((data) => setWebTime(data.totalTime || "0m"))
+      .catch(console.error);
+
+    // Fetch alerts
+    fetch(`${import.meta.env.VITE_BACKENDURL}/api/child/alerts/${childEmail}`)
+      .then((res) => res.json())
+      .then((data) => setAlerts(data.alerts?.length || 0))
+      .catch(console.error);
+
+    // Fetch blocked content count
+    fetch(`${import.meta.env.VITE_BACKENDURL}/api/child/blocked/${childEmail}`)
+      .then((res) => res.json())
+      .then((data) => setBlocked(data.count || 0))
+      .catch(console.error);
+
+  }, [childEmail]);
+
   const stats = [
     {
       icon: Clock,
       label: "Screen Time",
-      value: "00",
+      value: webTime,
       change: "+14%",
       changeType: "negative",
     },
     {
       icon: AlertTriangle,
       label: "Alerts",
-      value: "2",
-      change: "-50%",
+      value: alerts.toString(),
+      change: "-20%",
       changeType: "positive",
     },
     {
       icon: Eye,
       label: "Blocked Content",
-      value: "17",
+      value: blocked.toString(),
       change: "-12%",
       changeType: "positive",
     },
     {
       icon: Activity,
       label: "Active Sessions",
-      value: "1",
+      value: sessions.toString(),
       change: "No change",
       changeType: "neutral",
     },
