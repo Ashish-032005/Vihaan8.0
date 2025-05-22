@@ -23,8 +23,11 @@
     }
   ],
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": "favicon.png"
+  },
+  "icons": {
+    "128": "favicon.png"
   },
   "incognito": "spanning"
-
 }
