@@ -7,7 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // Register
 export const register = async (req, res) => {
-  const { email, password } = req.body;
+  const {name, email, password } = req.body;
 
   try {
     const existing = await Parent.findOne({ email });
@@ -16,6 +16,7 @@ export const register = async (req, res) => {
     // const hashedPassword = await bcrypt.hash(password, 10);
 
     const parent = await Parent.create({
+      name,
       email,
       password: password
     });
@@ -47,3 +48,23 @@ const validPass=(password==parent.password)
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+export const getParent=async(req,res)=>{
+  
+  try {
+
+  const email=req.user.email;
+  const parent=await Parent.findOne({email})
+     const { name } = parent;
+     console.log(parent.email)
+     console.log(parent.name)
+    //  console.log(parent)
+
+    res.json({ name, email });
+  
+} catch (error) 
+{
+  console.log(error)
+  res.status(404).json({error})
+  
+}
+}

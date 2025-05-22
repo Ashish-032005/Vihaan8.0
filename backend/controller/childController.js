@@ -6,8 +6,10 @@ import { generateToken } from "../utillity/jwt.js";
 
 // Create a new child for the parent
  export const createChild = async (req, res) => {
-  const {  email } = req.body;
-  console.log(req.body)
+  const {  name ,email } = req.body;
+  const parentEmail=req.user.email;
+  // console.log(req.user)
+  // console.log(req.body)
   try {
     // Find the parent by ID (assuming parent ID is available in the `req.parent` from middleware)
     const parent = await Parent.findOne({email :req.user.email});
@@ -17,6 +19,7 @@ import { generateToken } from "../utillity/jwt.js";
 
     // Create a new child instance
     const newChild = new Child({
+      name, 
       email,
       parent: parent._id, // link the child to the parent
     });

@@ -1,19 +1,18 @@
 import mongoose from "mongoose";
 
 const urlSchema = new mongoose.Schema({
+  url: String,
   domain: String,
-  category: String,
-  timeSpent: {
-    type: Number,
-    default: 0
+  dailyTimeSpent: {
+    type: Map,
+    of: Number, 
+    default: {}
   },
-  lastUpdated: {
-    type: Date,
-    default: Date.now
-  }
+  lastUpdated: { type: Date, default: Date.now }
 });
 
 const childSchema = new mongoose.Schema({
+  name:String,
   email: {
     type:String,
     unique:true,

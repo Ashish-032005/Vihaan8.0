@@ -14,16 +14,19 @@ export const monitorUrl = async (req, res) => {
     const {  childEmail } = decoded;
     const { domain, category = "general", timeSpent = 20 } = req.body;
 
-    const child = await parent.findOne({ email: childEmail });
+    const child = await Child.findOne({ email: childEmail });
     if (!child) {
       return res.status(404).json({ message: "Child not found" });
     }
 
     const existingUrl = child.monitoredUrls.find((url) => url.domain === domain);
     if (existingUrl) {
-      existingUrl.timeSpent += timeSpent;
+      const today =new Date().toISOString.split("T")[0];
+      currentTime = existingUrl.dailyTimeSpent.get(today)||0;
+      existingUrl.dailyTimeSpent.set(today, currentTime+timeSpent);
+
     } else {
-      child.monitoredUrls.push({ domain, category, timeSpent });
+      child.monitoredUrls.push({ domain, category, dailyTimeSpent:new  Map() });
     }
 
     await child.save();

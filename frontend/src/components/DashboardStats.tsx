@@ -1,12 +1,12 @@
 
 import { Activity, AlertTriangle, Clock, Eye } from "lucide-react";
 
-export const DashboardStats = () => {
+export const DashboardStats = (  childId: string | null) => {
   const stats = [
     {
       icon: Clock,
       label: "Screen Time",
-      value: "3h 24m",
+      value: "00",
       change: "+14%",
       changeType: "negative",
     },

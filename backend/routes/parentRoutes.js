@@ -1,6 +1,5 @@
 import express from 'express';
 import {
-    createChild,
   getAllChildren,
   getChildDetails,
   getChildUrls,
@@ -8,13 +7,13 @@ import {
   blockUrl,
   unblockUrl,
   resetTimeSpent
-} from '../controllers/parentController.js';
-import { verifyParentToken } from '../middleware/auth.js';
+} from '../controller/parentContoller.js';
+import { verifyToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.use(verifyParentToken);
-router.post('/children', authMiddleware, createChild);
+router.use(verifyToken);
+// router.post('/children', authMiddleware, createChild);
 router.get('/children', getAllChildren);
 router.get('/children/:id', getChildDetails);
 router.get('/children/:id/urls', getChildUrls);

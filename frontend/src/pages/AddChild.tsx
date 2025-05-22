@@ -15,6 +15,7 @@ import { useToast } from "@/components/ui/use-toast";
 
 const AddChild = () => {
   const [email, setEmail] = useState("");
+  const [name , setName] = useState("");
 
   // const [childName, setChildName] = useState("");
   const [token, setToken] = useState<string | null>(null);
@@ -34,7 +35,7 @@ const AddChild = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${parentToken}`,
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email,name }),
       });
   
       const data = await response.json();
@@ -67,13 +68,21 @@ const AddChild = () => {
         <CardHeader className="space-y-2 text-center">
           <CardTitle className="text-3xl font-bold">Add Child</CardTitle>
           <CardDescription>
-            Enter your child's email to generate their access token
+            Enter your child's details to generate their token
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Child's enail </Label>
+              <Label htmlFor="name">Child's Name </Label>
+              <Input
+                id="name"
+                placeholder="Enter child's name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+               <Label htmlFor="email">Child's email </Label>
               <Input
                 id="email"
                 placeholder="Enter child's email"

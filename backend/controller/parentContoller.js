@@ -2,17 +2,28 @@ import Parent from '../models/parent.js';
 import Child from '../models/child.js';
 
 // Get all children of a parent
+// controller
 export const getAllChildren = async (req, res) => {
   try {
-    const parent = await Parent.findById(req.parent._id).populate('children');
+    const parent = await Parent.findOne({email:req.user.email})
+      .populate({
+        path: 'children',
+        model: 'Child',
+        select: 'name email' //  Only return needed fields
+      });
+
     if (!parent) {
       return res.status(404).json({ message: "Parent not found" });
     }
-    res.json(parent.children);
+    console.log(parent.children)
+
+
+    res.json( parent.children ); // ✅ Full profiles, not just IDs
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 // Get details of a specific child
 export const getChildDetails = async (req, res) => {
