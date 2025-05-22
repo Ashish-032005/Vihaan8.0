@@ -53,7 +53,7 @@ export const getChildren = async (req, res) => {
 
 export const getWebUsageStats = async (req, res) => {
   try {
-    console.log(req.params)
+    // console.log(req.params)
     const { email } = req.params;
     const child = await Child.findOne({ email });
     if (!child) return res.status(404).json({ message: "Child not found" });
@@ -167,6 +167,47 @@ export const getBlockedStatsFull = async (req, res) => {
     res.json({ totalBlocked: blocked.length, blockedList: blocked });
   } catch (err) {
     console.error("Blocked content fetch error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+export const getSearchActivities = async (req, res) => {
+  try {
+    const { timeFrame } = req.body;
+    const { childEmail } = req.body;
+    console.log("filtered hitted ")
+    console.log(timeFrame)
+    console.log(childEmail)
+
+
+    if (!childEmail) return res.status(400).json({ message: "Child email is required" });
+
+    const child = await Child.findOne({ email: childEmail });
+    if (!child) return res.status(404).json({ message: "Child not found" });
+
+    const dateLimit = (() => {
+      const now = new Date();
+      switch (timeFrame) {
+        case "today": now.setHours(0, 0, 0, 0); return now;
+        case "yesterday": now.setDate(now.getDate() - 1); now.setHours(0, 0, 0, 0); return now;
+        case "week": now.setDate(now.getDate() - 7); return now;
+        case "month": now.setDate(now.getDate() - 30); return now;
+        default: return new Date(0);
+      }
+    })();
+
+    const searches = (child.searchHistory || []).filter(search =>
+      new Date(search.timestamp) >= dateLimit
+    ).map(search => ({
+      type: "search",
+      content: search.query,
+      timestamp: search.timestamp,
+    }));
+
+    searches.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    res.json({ activities: searches });
+  } catch (err) {
+    console.error("Error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };

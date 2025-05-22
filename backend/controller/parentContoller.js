@@ -15,7 +15,7 @@ export const getAllChildren = async (req, res) => {
     if (!parent) {
       return res.status(404).json({ message: "Parent not found" });
     }
-    console.log(parent.children)
+    // console.log(parent.children)
 
 
     res.json( parent.children ); // ✅ Full profiles, not just IDs

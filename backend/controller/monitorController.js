@@ -46,7 +46,7 @@ export const monitorUrl = async (req, res) => {
 export const alertIncognito = async (req, res) => {
   const {  url } = req.body;
   const email =req.user.email
-  console.log(email)
+  // console.log(email)
   if (!email || !url) {
     return res.status(400).json({ message: "Email and URL are required" });
   }
@@ -72,7 +72,7 @@ export const alertIncognito = async (req, res) => {
     child.incognitoAlerts.push({ url, timestamp: now });
     await child.save();
 
-    console.log("Incognito usage alert from:", child.email, "URL:", url);
+    // console.log("Incognito usage alert from:", child.email, "URL:", url);
     res.status(200).json({ message: "Incognito alert stored" });
 
   } catch (err) {

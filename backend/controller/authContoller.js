@@ -55,8 +55,8 @@ export const getParent=async(req,res)=>{
   const email=req.user.email;
   const parent=await Parent.findOne({email})
      const { name } = parent;
-     console.log(parent.email)
-     console.log(parent.name)
+    //  console.log(parent.email)
+    //  console.log(parent.name)
     //  console.log(parent)
 
     res.json({ name, email });
