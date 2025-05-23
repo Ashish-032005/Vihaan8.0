@@ -103,7 +103,7 @@ console.log(sortedUsage)
     };
 
     fetchData();
-  }, [childEmail]);
+  }, [childEmail , blockWebsite]);
 
   const formatTime = (minutes) => {
     const hours = Math.floor(minutes / 60);
@@ -163,7 +163,9 @@ console.log(sortedUsage)
           title: "Website blocked",
           description: `${normalizedDomain} has been added to blocked sites`,
         });
-        setBlockedWebsites((prev) => [...prev, normalizedDomain]);
+        // console.log()
+        console.log(blockedWebsites)
+        // setBlockedWebsites(res.bl);
         setBlockWebsite("");
       } else {
         toast({
