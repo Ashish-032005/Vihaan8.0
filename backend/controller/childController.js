@@ -59,15 +59,15 @@ export const getWebUsageStats = async (req, res) => {
     if (!child) return res.status(404).json({ message: "Child not found" });
 
     const today = new Date().toISOString().split("T")[0];
-    let totalMinutes = 0;
+    let totalSeconds = 0;
 
     child.monitoredUrls.forEach((url) => {
       const time = url.dailyTimeSpent.get(today) || 0;
-      totalMinutes += time;
+      totalSeconds += time;
     });
 
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
+    const hours = Math.floor(totalSeconds /(60*60));
+    const minutes =  Math.floor(totalSeconds /(60))%60;
     const totalTime = `${hours}h ${minutes}m`;
 
     res.json({ totalTime });
@@ -108,11 +108,11 @@ export const getWebUsageStatsFull = async (req, res) => {
 
     const today = new Date().toISOString().split("T")[0];
     const webUsage = [];
-    let totalMinutes = 0;
+    let totalSeconds = 0;
 
     child.monitoredUrls.forEach((urlObj) => {
       const time = urlObj.dailyTimeSpent.get(today) || 0;
-      totalMinutes += time;
+      totalSeconds += time;
 
       webUsage.push({
         domain: urlObj.domain,
@@ -122,8 +122,8 @@ export const getWebUsageStatsFull = async (req, res) => {
       });
     });
 
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
+    const hours = Math.floor(totalSeconds / 60*60);
+    const minutes = Math.floor(totalSeconds / 60);
 
     res.json({
       totalTime: `${hours}h ${minutes}m`,
@@ -175,8 +175,8 @@ export const getSearchActivities = async (req, res) => {
     const { timeFrame } = req.body;
     const { childEmail } = req.body;
     console.log("filtered hitted ")
-    console.log(timeFrame)
-    console.log(childEmail)
+    // console.log(timeFrame)
+    // console.log(childEmail)
 
 
     if (!childEmail) return res.status(400).json({ message: "Child email is required" });
@@ -194,13 +194,16 @@ export const getSearchActivities = async (req, res) => {
         default: return new Date(0);
       }
     })();
-
-    const searches = (child.searchHistory || []).filter(search =>
-      new Date(search.timestamp) >= dateLimit
+ console.log(timeFrame, child.monitoredUrls)
+    const searches = (child.monitoredUrls || []).filter(search =>
+    {  
+      console.log(search.lastUpdated , dateLimit)
+     return  new Date(search.lastUpdated) >= dateLimit
+    }
     ).map(search => ({
       type: "search",
-      content: search.query,
-      timestamp: search.timestamp,
+      content: search.domain,
+      timestamp: search.lastUpdated,
     }));
 
     searches.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));

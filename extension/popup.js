@@ -23,7 +23,7 @@ document.getElementById("saveToken").addEventListener("click", async () => {
   console.log("Token entered:", token);
 
   await setInStorage("token", token);
-  alert("Token saved! " + token);
+  alert("Token saved! ");
 
   const storedToken = await getFromStorage("token");
   console.log("Stored token:", storedToken);

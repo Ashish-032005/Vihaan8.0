@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import Child from "../models/child.js";
 import parent from "../models/parent.js"
 export const monitorUrl = async (req, res) => {
-  // console.log("request arrived");
+  console.log("request arrived");
 
   try {
     const token = req.headers.authorization?.split(" ")[1];
@@ -11,7 +11,7 @@ export const monitorUrl = async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { email } = decoded;
-    const { domain, category = "general", timeSpent = 20 } = req.body;
+    const { domain, category = "general", timeSpent = 60 } = req.body;
 
     const child = await Child.findOne({ email });
     if (!child) return res.status(404).json({ message: "Child not found" });
@@ -28,7 +28,7 @@ export const monitorUrl = async (req, res) => {
         domain,
         category,
         dailyTimeSpent: new Map([[today, timeSpent]]), // initialize with today's time
-        lastUpdated: new Date() // ✅ set timestamp on creation
+        lastUpdated: new Date() //
       });
     }
 

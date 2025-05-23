@@ -5,6 +5,7 @@ import { toast } from "@/hooks/use-toast";
 export const ActivityMonitor = ({childEmail}) => {
   const [timeFrame, setTimeFrame] = useState("today");
   const [activities, setActivities] = useState([]);
+  console.log(childEmail)
 
   const getActivityIcon = (type: string) => {
     switch (type) {
@@ -30,7 +31,7 @@ const fetchActivities = async () => {
     const data = await res.json();
     console.log(data);
     setActivities(data.activities || []);
-    
+
   } catch (err) {
     console.error("Error fetching activities:", err);
     toast({ title: "Error", description: "Could not load activity data." });
@@ -40,8 +41,9 @@ const fetchActivities = async () => {
 
 
   useEffect(() => {
+    console.log("mounted" + childEmail)
     fetchActivities();
-  }, [timeFrame]);
+  }, [timeFrame ,childEmail]);
 
   return (
     <div className="glass-card p-6">

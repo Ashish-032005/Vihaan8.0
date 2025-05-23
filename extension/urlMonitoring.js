@@ -1,7 +1,7 @@
 const API_URL = "https://your-backend.com/api/check-url";
 const INCOGNITO_ALERT_URL = "http://localhost:5000";
 const ACTIVE_TAB_UPDATE_URL = "http://localhost:5000/api/monitor/active-tab"; // Backend endpoint to receive active tab data
-console.log("Background worker loaded");
+// console.log("Background worker loaded");
 
 let currentTabId = null;
 let currentUrl = null;
@@ -10,7 +10,7 @@ let intervalId = null;
 
 // Monitor incognito window access permissions
 function monitorIncognitoPermission() {
-  console.log('Monitoring Incognito Permission');
+  // console.log('Monitoring Incognito Permission');
 
   setInterval(() => {
     chrome.extension.isAllowedIncognitoAccess((isAllowed) => {
@@ -19,7 +19,7 @@ function monitorIncognitoPermission() {
         alertIncognitoOpen("unknown"); // Send generic alert if incognito detected
       }
     });
-  }, 10000); // Check every 10 seconds
+  }, 60000); // Check in one minute 
 }
 // Send alert if incognito is being used without permission
 async function alertIncognitoOpen(url) {
@@ -55,7 +55,7 @@ async function alertIncognitoOpen(url) {
 async function updateActiveTabToBackend() {
   chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
     const activeTab = tabs[0];
-
+console.log("request headed ")
     if (activeTab && activeTab.url) {
       const currentTabUrl = new URL(activeTab.url).hostname;
       console.log("Sending active tab data to backend:", currentTabUrl);
@@ -216,4 +216,4 @@ monitorIncognitoPermission();
 // Send active tab data to the backend every 60 seconds
 setInterval(() => {
   updateActiveTabToBackend();
-}, 6000); // Update backend every 1 minute
+}, 60000); // Update backend every 1 minute

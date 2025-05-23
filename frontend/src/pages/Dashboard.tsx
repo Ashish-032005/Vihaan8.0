@@ -42,7 +42,10 @@ const Dashboard = () => {
     const navigate=useNavigate();
     const unreadCount = notifications.filter(n => !n.read).length;
     const [selectedChildEmail, setSelectedChildEmail] = useState<string | null>(null);
-    console.log(selectedChildEmail)
+    // console.log(selectedChildEmail)
+    console.log(children)
+        // if(children)setSelectedChildEmail(children[0]?.email)
+
    // Fetch data on mount
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -59,6 +62,7 @@ const Dashboard = () => {
           axios.get(`${import.meta.env.VITE_BACKENDURL}/api/auth/user`, { headers }),
           axios.get(`${import.meta.env.VITE_BACKENDURL}/api/parent/children`, { headers }),
           axios.get("/api/notifications", { headers })
+
         ]);
         // console.log(parentRes)
         console.log(childrenRes.data)
@@ -66,6 +70,8 @@ const Dashboard = () => {
         setParentName(parentRes.data.name);
         setParentEmail(parentRes.data.email);
         setChildren(childrenRes.data);
+        if(children)setSelectedChildEmail(children[0].email)
+
         // setNotifications(notificationsRes.data);
       } catch (error) {
         console.error("Error fetching data", error);
