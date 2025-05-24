@@ -522,118 +522,119 @@ const offensiveWords = [
   "zoophilia",
 ];
 
+
 // --- Text Detection & Removal ---
+const NSFW_THRESHOLD = 0.3;
+
+
+// Traverse DOM + shadow DOM
+function traverseDOM(node, callback) {
+  callback(node);
+  if (node.shadowRoot) {
+    node.shadowRoot.childNodes.forEach(child => traverseDOM(child, callback));
+  }
+  node.childNodes.forEach(child => traverseDOM(child, callback));
+}
+
+
+// Clean offensive text nodes
 function cleanText(node) {
   if (node.nodeType === 3) {
     const regex = new RegExp(`\\b(${offensiveWords.join("|")})\\b`, "gi");
-
     if (regex.test(node.nodeValue)) {
       const censoredText = node.nodeValue.replace(regex, "****");
       const newTextNode = document.createTextNode(censoredText);
       node.parentNode.replaceChild(newTextNode, node);
     }
-  } else {
-    node.childNodes.forEach(cleanText);
   }
 }
-cleanText(document.body);
-// function blurOffensiveImages() {
-//   document.querySelectorAll("img").forEach((img) => {
-//     const altText = img.alt.toLowerCase();
-//     if (offensiveWords.some((word) => altText.includes(word))) {
-//       img.classList.add("blurred-safe");
-//     }
-//   });
-// }
-
-// // Initial run
-// blurOffensiveImages();
 
 
-// // Mutation Observer for dynamic pages
-// const observer = new MutationObserver((mutations) => {
-//   mutations.forEach((mutation) => {
-//     mutation.addedNodes.forEach((node) => {
-//       cleanText(node);
-//       if (node.nodeType === 1) blurOffensiveImages();
-//     });
-//   });
-// });
-
-// observer.observe(document.body, { childList: true, subtree: true });
-
-const NSFW_THRESHOLD = 0.3; // adjust this based on model behavior
-
-  async function classifyImage(img) {
-    try {
-      // Create canvas
-      const canvas = document.createElement("canvas");
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      console.log("width height")
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0);
-      console.log(ctx)
-      // Convert canvas to blob
-      const blob = await new Promise(resolve =>
-        canvas.toBlob(resolve, "image/jpeg")
-      );
-      console.log("yea after blob")
-      if (!blob) throw new Error("Failed to convert image to blob");
-
-      // Prepare FormData
-      const formData = new FormData();
-      formData.append("file", blob, "image.jpg");
-      console.log("after formData")
-      // Send request to model
-      const response = await fetch("https://9953-34-16-246-1.ngrok-free.app/classify", {
-        method: "POST",
-        body: formData,
-      });
-      console.log("response generated")
-      const data = await response.json();
-
-      const nsfwScore = data.labels?.nsfw ?? 0;
-      if (nsfwScore >= NSFW_THRESHOLD) {
-        img.classList.add("blurred-safe");
-      }
-      console.log("score generated")
-    } catch (err) {
-      console.error("Image NSFW check failed:", err);
+// Blur images with offensive alt text
+function blurOffensiveImages(node) {
+  if (node.tagName === "IMG") {
+    const altText = (node.alt || "").toLowerCase();
+    if (offensiveWords.some(word => altText.includes(word))) {
+      node.classList.add("blurred-safe");
     }
   }
+}
 
-  async function checkAllImages() {
-    const images = Array.from(document.querySelectorAll("img"));
-    for (const img of images) {
-      // Make sure image is loaded
-      if (img.complete && img.naturalWidth !== 0) {
-        await classifyImage(img);
-      } else {
-        img.addEventListener("load", () => classifyImage(img));
-      }
-    }
-  }
 
-  // Initial Run
-  checkAllImages();
+// Async classify using AI endpoint
+async function classifyImage(img) {
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    const blob = await new Promise(resolve =>
+      canvas.toBlob(resolve, "image/jpeg")
+    );
+    if (!blob) throw new Error("Failed to convert image to blob");
 
-  // For dynamic content
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      mutation.addedNodes.forEach((node) => {
-        if (node.nodeType === 1) {
-          const imgs = node.querySelectorAll?.("img") || [];
-          imgs.forEach(img => {
-            if (img.complete && img.naturalWidth !== 0) {
-              classifyImage(img);
-            } else {
-              img.addEventListener("load", () => classifyImage(img));
-            }
-          });
-        }
-      });
+
+    const formData = new FormData();
+    formData.append("file", blob, "image.jpg");
+
+
+    const response = await fetch("https://84b3-34-105-2-146.ngrok-free.app/classify/", {
+      method: "POST",
+      body: formData,
     });
-  });
 
-  observer.observe(document.body, { childList: true, subtree: true });
+
+    const data = await response.json();
+    const nsfwScore = data.labels?.nsfw ?? 0;
+    if (nsfwScore >= NSFW_THRESHOLD) {
+      img.classList.add("blurred-safe");
+    }
+  } catch (err) {
+    console.error("Image NSFW check failed:", err);
+  }
+}
+
+
+// Handle each node
+function handleNode(node) {
+  cleanText(node);
+  blurOffensiveImages(node);
+
+
+  if (node.tagName === "IMG") {
+    if (node.complete && node.naturalWidth !== 0) {
+      classifyImage(node);
+    } else {
+      node.addEventListener("load", () => classifyImage(node));
+    }
+  }
+}
+
+
+// Check all images and text
+function scanAllContent() {
+  traverseDOM(document.body, handleNode);
+}
+
+
+// Initial run
+scanAllContent();
+
+
+// Observe for changes
+const observer = new MutationObserver((mutations) => {
+  for (const mutation of mutations) {
+    for (const node of mutation.addedNodes) {
+      if (node.nodeType === 1) {
+        traverseDOM(node, handleNode);
+      }
+    }
+  }
+});
+
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});

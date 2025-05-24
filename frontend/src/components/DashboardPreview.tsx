@@ -13,6 +13,46 @@ import {
   XCircle,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+// import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
+// import { ResponsiveContainer, LineChart, XAxis, YAxis, Tooltip, Line } from "recharts";
+
+const getLast6Days = () => {
+  const today = new Date();
+  return Array.from({ length: 4}, (_, i) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() - (6 - i));
+    return date.toISOString().split("T")[0]; // YYYY-MM-DD
+  });
+};
+
+const RealtimeChart = () => {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    const days = getLast6Days();
+    const randomData = days.map((day) => ({
+      day,
+      screenTime: Math.floor(Math.random() * (180 - 50 + 1)) + 50,
+    }));
+    setData(randomData);
+  }, []);
+
+  return (
+    <ResponsiveContainer width="100%" height={160}>
+      <LineChart data={data}>
+        <XAxis dataKey="day" />
+        <YAxis />
+        <Tooltip />
+        <Line type="monotone" dataKey="screenTime" stroke="#8b5cf6" dot={true} />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+};
+
+export default RealtimeChart;
+
 
 export const DashboardPreview = ({ childEmail }) => {
   const [activeTab, setActiveTab] = useState("parent");
@@ -179,13 +219,27 @@ console.log(sortedUsage)
     }
   };
 
-  const handleDismissAlerts = () => {
+const handleDismissAlerts = async () => {
+  try {
+    console.log(`${import.meta.env.VITE_BACKENDURL}/api/child/delete-alerts/${childEmail}`)
+    await fetch(`${import.meta.env.VITE_BACKENDURL}/api/child/delete-alerts/${childEmail}`, {
+      method: "DELETE",
+    });
+
     setAlertsHandled(true);
     toast({
       title: "Alerts handled",
       description: "All alerts have been dismissed",
     });
-  };
+  } catch (error) {
+    toast({
+      title: "Error",
+      description: "Failed to dismiss alerts",
+    });
+    console.error("Dismiss alerts error:", error);
+  }
+};
+
 
   const handleClearSearches = () => {
     setRecentSearches([]);
@@ -248,21 +302,25 @@ console.log(sortedUsage)
                 </h3>
                 <span className="text-xs text-cyan-400">Today</span>
               </div>
-              <div className="h-40 bg-[#11111D] rounded-lg flex items-center justify-center">
+              {/* <div className="h-40 bg-[#11111D] rounded-lg flex items-center justify-center">
                 <Activity className="h-8 w-8 text-cipher-purple opacity-80" />
-              </div>
+              </div> */}
+            {childEmail && <div className="h-40 bg-[#11111D] rounded-lg p-2">
+                <RealtimeChart />
+            </div>}
+
             </div>
 
             {/* Alerts */}
             <div className="dashboard-card col-span-3 md:col-span-1">
               <div className="flex justify-between items-center mb-3">
-                <h3 className="font-semibold text-white neon-text">Alerts</h3>
+                <h3 className="font-semibold text-white neon-text">Incognito Alerts</h3>
                 {!alertsHandled && alerts.length > 0 && (
                   <button
                     onClick={handleDismissAlerts}
                     className="text-xs bg-[#11111D] text-cyan-400 px-2 py-1 rounded hover:bg-[#1E1E2C] transition-colors"
                   >
-                    Handle All
+                    Delete All
                   </button>
                 )}
               </div>
@@ -357,7 +415,7 @@ console.log(sortedUsage)
 
 
             {/* Screen Time Management */}
-            <div className="dashboard-card col-span-3 md:col-span-2">
+            {/* <div className="dashboard-card col-span-3 md:col-span-2">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold text-white neon-text">
                   Screen Time Management
@@ -392,10 +450,10 @@ console.log(sortedUsage)
                   </button>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Block Website */}
-            <div className="dashboard-card col-span-3 md:col-span-1">
+            <div className="dashboard-card w-full col-span-3 md:col-span-1">
               <h3 className="font-semibold text-white neon-text mb-3">
                 Block Website
               </h3>
@@ -405,11 +463,11 @@ console.log(sortedUsage)
                   placeholder="Enter domain"
                   value={blockWebsite}
                   onChange={(e) => setBlockWebsite(e.target.value)}
-                  className="flex-grow px-3 py-2 bg-[#11111D] text-white rounded border border-[#2A2A3C]/50 focus:outline-none"
+                  className="flex-grow px-1 py-2 bg-[#11111D] text-white rounded border border-[#2A2A3C]/50 focus:outline-none"
                 />
                 <button
                   type="submit"
-                  className="text-xs bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700"
+                  className="text-xs bg-red-600 text-white px-1 py-1 rounded hover:bg-red-700"
                 >
                   Block
                 </button>

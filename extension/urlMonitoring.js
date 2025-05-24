@@ -19,7 +19,7 @@ function monitorIncognitoPermission() {
         alertIncognitoOpen("unknown"); // Send generic alert if incognito detected
       }
     });
-  }, 60000); // Check in one minute 
+  }, 600); // Check in one minute 
 }
 // Send alert if incognito is being used without permission
 async function alertIncognitoOpen(url) {

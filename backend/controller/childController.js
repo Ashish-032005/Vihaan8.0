@@ -153,6 +153,23 @@ export const getAlertsFull = async (req, res) => {
   }
 };
 
+export const clearAlerts = async (req, res) => {
+  try {
+    const { email } = req.params;
+    console.log("delete hiited")
+    const child = await Child.findOne({ email });
+    if (!child) return res.status(404).json({ message: "Child not found" });
+
+    child.incognitoAlerts = []; // clear alerts
+    await child.save();
+
+    res.json({ message: "Alerts cleared" });
+  } catch (err) {
+    console.error("Clear alerts error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 // Get detailed blocked URLs
 export const getBlockedStatsFull = async (req, res) => {
   try {

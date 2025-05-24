@@ -19,12 +19,16 @@
     {
       "matches": ["<all_urls>"],
       "js": ["content.js"],
-      "css": ["styles.css"]
+      "css": ["styles.css"],
+      "type": "module"
     }
   ],
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": "favicon.png"
+  },
+  "icons": {
+    "128": "favicon.png"
   },
   "incognito": "spanning"
-
 }
