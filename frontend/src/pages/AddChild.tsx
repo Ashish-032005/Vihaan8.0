@@ -29,7 +29,7 @@ const AddChild = () => {
       console.log("Parent Token:", parentToken);
       console.log("Child Email:", email);
   
-      const response = await fetch("http://localhost:5000/api/child/add-child", {
+      const response = await fetch(`${import.meta.env.VITE_BACKENDURL}/api/child/add-child`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,6 +1,6 @@
 const API_URL = "https://your-backend.com/api/check-url";
-const INCOGNITO_ALERT_URL = "http://localhost:5000";
-const ACTIVE_TAB_UPDATE_URL = "http://localhost:5000/api/monitor/active-tab"; // Backend endpoint to receive active tab data
+const INCOGNITO_ALERT_URL = import.meta.env.VITE_BACKENDURL ;
+const ACTIVE_TAB_UPDATE_URL = `${import.meta.env.VITE_BACKENDURL}/api/monitor/active-tab`; // Backend endpoint to receive active tab data
 // console.log("Background worker loaded");
 
 let currentTabId = null;
@@ -32,7 +32,7 @@ async function alertIncognitoOpen(url) {
     }
 
     try {
-      await fetch("http://localhost:5000/api/monitor/incognito-alert", {
+      await fetch(`${import.meta.env.VITE_BACKENDURL}/api/monitor/incognito-alert`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -67,7 +67,7 @@ console.log("request headed ")
         }
 
         try {
-          await fetch("http://localhost:5000/api/monitor/monitor-url", {
+          await fetch(`${import.meta.env.VITE_BACKENDURL}/api/monitor/monitor-url`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -167,7 +167,7 @@ async function checkUrlWithBackend(url) {
   if (!token) return { blocked: false };
 
   try {
-    const res = await fetch("http://localhost:5000/api/monitor/check-url", {
+    const res = await fetch(`${import.meta.env.VITE_BACKENDURL}/api/monitor/check-url`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
