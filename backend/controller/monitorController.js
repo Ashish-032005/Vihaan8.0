@@ -2,28 +2,34 @@
 import jwt from "jsonwebtoken";
 import Child from "../models/child.js";
 import parent from "../models/parent.js"
-
 export const monitorUrl = async (req, res) => {
+  console.log("request arrived");
+
   try {
     const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-      return res.status(401).json({ message: "No token provided" });
-    }
+    if (!token) return res.status(401).json({ message: "No token provided" });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const {  childEmail } = decoded;
-    const { domain, category = "general", timeSpent = 20 } = req.body;
+    const { email } = decoded;
+    const { domain, category = "general", timeSpent = 60 } = req.body;
 
-    const child = await parent.findOne({ email: childEmail });
-    if (!child) {
-      return res.status(404).json({ message: "Child not found" });
-    }
+    const child = await Child.findOne({ email });
+    if (!child) return res.status(404).json({ message: "Child not found" });
 
-    const existingUrl = child.monitoredUrls.find((url) => url.domain === domain);
+    const today = new Date().toISOString().split("T")[0];
+    const existingUrl = child.monitoredUrls.find(url => url.domain === domain);
+
     if (existingUrl) {
-      existingUrl.timeSpent += timeSpent;
+      const currentTime = existingUrl.dailyTimeSpent.get(today) || 0;
+      existingUrl.dailyTimeSpent.set(today, currentTime + timeSpent);
+      existingUrl.lastUpdated = new Date(); // ✅ update timestamp
     } else {
-      child.monitoredUrls.push({ domain, category, timeSpent });
+      child.monitoredUrls.push({
+        domain,
+        category,
+        dailyTimeSpent: new Map([[today, timeSpent]]), // initialize with today's time
+        lastUpdated: new Date() //
+      });
     }
 
     await child.save();
@@ -40,7 +46,7 @@ export const monitorUrl = async (req, res) => {
 export const alertIncognito = async (req, res) => {
   const {  url } = req.body;
   const email =req.user.email
-  console.log(email)
+  // console.log(email)
   if (!email || !url) {
     return res.status(400).json({ message: "Email and URL are required" });
   }
@@ -66,13 +72,22 @@ export const alertIncognito = async (req, res) => {
     child.incognitoAlerts.push({ url, timestamp: now });
     await child.save();
 
-    console.log("Incognito usage alert from:", child.email, "URL:", url);
+    // console.log("Incognito usage alert from:", child.email, "URL:", url);
     res.status(200).json({ message: "Incognito alert stored" });
 
   } catch (err) {
     console.error("Error storing incognito alert:", err);
     res.status(500).json({ message: "Server error" });
   }
+};
+export const checkUrl= async (req, res) => {
+  const { url } = req.body;
+  const {email} =req.user; // from token payload
+
+  const child = await Child.findOne({email});
+  if (!child) return res.status(404).json({ blocked: false });
+  const isBlocked = child.blockedUrls.some(blockedUrl => url.includes(blockedUrl));
+  res.json({ blocked: isBlocked });
 };
 
   

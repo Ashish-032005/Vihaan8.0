@@ -1,15 +1,16 @@
 
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, Home, Info, Shield, CreditCard, HelpCircle, LayoutDashboard, Mail } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "./Button";
 import { ShieldLogo } from "./ShieldLogo";
 
 export const Navbar = () => {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const isHomePage = location.pathname === "/";
-
+  const token = localStorage.getItem('token') || null; 
   // Close mobile menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
@@ -68,13 +69,13 @@ export const Navbar = () => {
               <Info size={18} />
               <span>How It Works</span>
             </button>
-            <button 
+            {/* <button 
               onClick={() => scrollToSection('pricing')}
               className="font-medium text-gray-300 hover:text-cipher-purple transition-colors flex items-center gap-1.5"
             >
               <CreditCard size={18} />
               <span>Pricing</span>
-            </button>
+            </button> */}
             <button 
               onClick={() => scrollToSection('faq')}
               className="font-medium text-gray-300 hover:text-cipher-purple transition-colors flex items-center gap-1.5"
@@ -91,7 +92,7 @@ export const Navbar = () => {
               <span>Dashboard</span>
             </Link>
           </div>
-          <Button variant="primary" onClick={() => scrollToSection('pricing')}>Try For Free</Button>
+          {!token && <Button variant="primary" onClick={() => navigate('../login')}>Login</Button>}
         </div>
 
         {/* Mobile Menu Button */}
@@ -143,8 +144,8 @@ export const Navbar = () => {
             <LayoutDashboard size={18} />
             <span>Dashboard</span>
           </Link>
-          <Button variant="primary" className="w-full mt-2" onClick={() => scrollToSection('pricing')}>
-            Try For Free
+          <Button variant="primary" className="w-full mt-2" onClick={() => navigate('../login')}>
+            Login
           </Button>
         </div>
       )}

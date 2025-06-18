@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import childRoutes from "./routes/child.js";
 import monitorRoutes from './routes/monitorRoutes.js';
 import authRoutes from "./routes/authRoutes.js";
+import parentRoutes from "./routes/parentRoutes.js"
 dotenv.config();
 
 const app = express();
@@ -27,6 +28,7 @@ connectDB();
 app.use('/api/monitor', monitorRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/child", childRoutes);
+app.use("/api/parent",parentRoutes)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

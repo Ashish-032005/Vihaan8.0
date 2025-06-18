@@ -522,11 +522,25 @@ const offensiveWords = [
   "zoophilia",
 ];
 
+
 // --- Text Detection & Removal ---
+const NSFW_THRESHOLD = 0.3;
+
+
+// Traverse DOM + shadow DOM
+function traverseDOM(node, callback) {
+  callback(node);
+  if (node.shadowRoot) {
+    node.shadowRoot.childNodes.forEach(child => traverseDOM(child, callback));
+  }
+  node.childNodes.forEach(child => traverseDOM(child, callback));
+}
+
+
+// Clean offensive text nodes
 function cleanText(node) {
   if (node.nodeType === 3) {
     const regex = new RegExp(`\\b(${offensiveWords.join("|")})\\b`, "gi");
-
     if (regex.test(node.nodeValue)) {
       const censoredText = node.nodeValue.replace(regex, "****");
       const newTextNode = document.createTextNode(censoredText);
@@ -603,37 +617,46 @@ const NSFW_THRESHOLD = 0.3; // adjust this based on model behavior
     }
   }
 
-  async function checkAllImages() {
-    const images = Array.from(document.querySelectorAll("img"));
-    for (const img of images) {
-      // Make sure image is loaded
-      if (img.complete && img.naturalWidth !== 0) {
-        await classifyImage(img);
-      } else {
-        img.addEventListener("load", () => classifyImage(img));
+
+// Handle each node
+function handleNode(node) {
+  cleanText(node);
+  blurOffensiveImages(node);
+
+
+  if (node.tagName === "IMG") {
+    if (node.complete && node.naturalWidth !== 0) {
+      classifyImage(node);
+    } else {
+      node.addEventListener("load", () => classifyImage(node));
+    }
+  }
+}
+
+
+// Check all images and text
+function scanAllContent() {
+  traverseDOM(document.body, handleNode);
+}
+
+
+// Initial run
+scanAllContent();
+
+
+// Observe for changes
+const observer = new MutationObserver((mutations) => {
+  for (const mutation of mutations) {
+    for (const node of mutation.addedNodes) {
+      if (node.nodeType === 1) {
+        traverseDOM(node, handleNode);
       }
     }
   }
+});
 
-  // Initial Run
-  checkAllImages();
 
-  // For dynamic content
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      mutation.addedNodes.forEach((node) => {
-        if (node.nodeType === 1) {
-          const imgs = node.querySelectorAll?.("img") || [];
-          imgs.forEach(img => {
-            if (img.complete && img.naturalWidth !== 0) {
-              classifyImage(img);
-            } else {
-              img.addEventListener("load", () => classifyImage(img));
-            }
-          });
-        }
-      });
-    });
-  });
-
-  observer.observe(document.body, { childList: true, subtree: true });
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});

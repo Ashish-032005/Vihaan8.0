@@ -9,6 +9,7 @@ import { Mail, Lock, UserPlus, ArrowRight } from "lucide-react";
 const SignUp = () => {
 
   const [email, setEmail] = useState("");
+  const [name, setName]=useState('')
   const [password, setPassword] = useState("");
   // const [confirmPassword, setConfirmPassword] = useState("");
   const handleSubmit = async (e: React.FormEvent) => {
@@ -17,7 +18,7 @@ const SignUp = () => {
       const res = await fetch("http://localhost:5000/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({name, email, password }),
       });
   
       const data = await res.json();
@@ -48,6 +49,22 @@ const SignUp = () => {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="name"
+                  type="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter your Name"
+                  className="pl-9"
+                  required
+                />
+
+              </div>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">

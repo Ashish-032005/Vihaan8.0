@@ -1,6 +1,5 @@
 import express from 'express';
 import {
-    createChild,
   getAllChildren,
   getChildDetails,
   getChildUrls,
@@ -8,18 +7,19 @@ import {
   blockUrl,
   unblockUrl,
   resetTimeSpent
-} from '../controllers/parentController.js';
-import { verifyParentToken } from '../middleware/auth.js';
+} from '../controller/parentContoller.js';
+import { verifyToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.use(verifyParentToken);
-router.post('/children', authMiddleware, createChild);
+router.use(verifyToken);
+// router.post('/children', authMiddleware, createChild);
 router.get('/children', getAllChildren);
 router.get('/children/:id', getChildDetails);
 router.get('/children/:id/urls', getChildUrls);
 router.get('/children/:id/alerts', getChildAlerts);
-router.post('/children/:id/block', blockUrl);
+router.post('/children/block', blockUrl);
+// router.get('/children/block', ()=>{console.log("block hitted")});
 router.post('/children/:id/unblock', unblockUrl);
 router.post('/children/:id/reset', resetTimeSpent);
 
